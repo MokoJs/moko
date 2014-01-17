@@ -1,6 +1,6 @@
 {
-  "name": "modo",
-  "version": "0.1.0",
+  "name": "moxie",
+  "version": "0.0.0",
   "description": "Generator based models",
   "main": "index.js",
   "scripts": {
@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://git@github.com:rschmukler/modo"
+    "url": "git://git@github.com:MoxieJs/moxie"
   },
   "keywords": [
-    "modo",
+    "moxie",
     "models",
     "generators"
   ],
   "author": "Ryan Schmukler <ryan@slingingcode.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rschmukler/modo/issues"
+    "url": "https://github.com/MoxieJs/moxie/issues"
   }
 }
