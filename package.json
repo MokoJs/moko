@@ -1,5 +1,5 @@
 {
-  "name": "moxie",
+  "name": "moko",
   "version": "0.0.0",
   "description": "Generator based models",
   "main": "index.js",
@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://git@github.com:MoxieJs/moxie"
+    "url": "git://git@github.com:MokoJs/moko"
   },
   "keywords": [
-    "moxie",
+    "moko",
     "models",
     "generators"
   ],
   "author": "Ryan Schmukler <ryan@slingingcode.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MoxieJs/moxie/issues"
+    "url": "https://github.com/MokoJs/moko/issues"
   }
 }
