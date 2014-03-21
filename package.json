@@ -19,5 +19,14 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/MokoJs/moko/issues"
+  },
+  "dependencies": {
+    "co": "~3.0.2",
+    "co-middleware": "~0.1.0",
+    "clone": "~0.1.11"
+  },
+  "devDependencies": {
+    "mocha": "~1.16.2",
+    "expect.js": "~0.2.0"
   }
 }
