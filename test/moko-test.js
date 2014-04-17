@@ -155,8 +155,20 @@ describe('Moko Base Methods', function() {
       });
     });
   });
+
+  describe('Model.validate', function() {
+    it('adds the validator to Model._validators', function() {
+      var validator = function *() {
+      };
+      User.validate(validator);
+      expect(User._validators).to.have.length(1);
+      expect(User._validators[0]).to.be(validator);
+      User._validators = [];
+    });
+  });
+
   describe('instance methods', function() {
-    describe('instance.set', function() {
+    describe('#set', function() {
       it('sets multiple attributes', co(function*() {
         var user = yield new User();
         user.set({name: 'bob'});
@@ -168,6 +180,75 @@ describe('Moko Base Methods', function() {
         user.set({name: 'bob', age: 20});
         expect(user.name).to.be('bob');
         expect(user.age).to.be(undefined);
+      }));
+    });
+
+    describe('#error', function() {
+      it('adds the error', co(function *() {
+        var user = yield new User();
+        user.error('name', 'cant be blank');
+        expect(user._errors).to.have.property('name');
+        expect(user._errors.name).to.have.length(1);
+      }));
+    });
+
+    describe('#errors', function() {
+      it('returns all errors if no key specified', co(function *() {
+        var user = yield new User();
+        user.error('name', 'cant be blank');
+        expect(user.errors()).to.have.key('name');
+      }));
+
+      it('returns the errors array for the key', co(function *() {
+        var user = yield new User();
+        user.error('name', 'cant be blank');
+        expect(user.errors('name')).to.eql(['cant be blank']);
+      }));
+
+      it('returns an empty array if there are no errors', co(function *() {
+        var user = yield new User();
+        expect(user.errors('name')).to.have.length(0);
+      }));
+    });
+
+    describe('#isValid', function() {
+      it('runs the validators', co(function *() {
+        var User = Moko('User'),
+            user = yield new User();
+
+        var count = 0;
+
+        User.validate(function *(u) {
+          count++;
+          expect(u).to.be(user);
+          u.error('name', 'cant be blank');
+        });
+        yield user.isValid();
+        expect(count).to.be(1);
+      }));
+
+      it('returns true if no errors', co(function*() {
+        var user = yield new User();
+        expect(yield user.isValid()).to.be(true);
+      }));
+      
+      it('returns false if errors', co(function*() {
+        var User = new Moko();
+        User.validate(function *() {
+          user.error('name', 'dumb');
+        });
+        var user = yield new User();
+        expect(yield user.isValid()).to.be(false);
+      }));
+
+      it('supports lookup on a specific field', co(function *() {
+        var User = new Moko();
+        User.validate(function *() {
+          user.error('name', 'dumb');
+        });
+        var user = yield new User();
+        expect(yield user.isValid('brobob')).to.be(true);
+        expect(yield user.isValid('name')).to.be(false);
       }));
     });
   });

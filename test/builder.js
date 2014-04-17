@@ -22,6 +22,11 @@ describe('Moko Builder', function() {
     expect(User.attrs).to.eql({});
   });
 
+  it('sets the validators to an empty array', function() {
+    var User = new Moko('User');
+    expect(User._validators).to.eql([]);
+  });
+
   describe('use', function() {
     it('adds it to the Moko builder-plugins', function() {
       expect(Moko._plugins).to.be.an(Array);
@@ -33,8 +38,8 @@ describe('Moko Builder', function() {
         count++;
       });
 
-      new Moko('User');
-      new Moko('Person');
+      Moko('User');
+      Moko('Person');
 
       expect(count).to.be(2);
     });
