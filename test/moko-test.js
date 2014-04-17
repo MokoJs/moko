@@ -121,7 +121,7 @@ describe('Moko Base Methods', function() {
       it('emits "change <attr>" on instance', function(done) {
         co(function*() {
           var user = yield new User({name: 'Bob'});
-          user.on('change', function(prop, val, old) {
+          user.on('change name', function(val, old) {
             expect(val).to.be('Marko');
             expect(old).to.be('Bob');
             user.removeAllListeners();
