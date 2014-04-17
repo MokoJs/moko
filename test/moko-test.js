@@ -6,6 +6,8 @@ var expect = require('expect.js'),
 var Moko = require('../'),
     User = new Moko('User');
 
+User.attr('_id');
+
 describe('Moko Base Methods', function() {
 
   describe("Constructor", function() {
@@ -83,6 +85,21 @@ describe('Moko Base Methods', function() {
       user.name = 'Bob';
       expect(user._attrs.name).to.be('Bob');
     }));
+
+    it('returns the Model', function() {
+      var Person = new Moko('Person');
+      expect(Person.attr('name')).to.be(Person);
+    });
+
+    it('sets primary', function() {
+      var Person = new Moko('Person').attr('id'),
+          Another = new Moko('Person').attr('_id'),
+          Again = new Moko('Person').attr('random', { primary: true });
+
+      expect(Person._primary).to.be('id');
+      expect(Another._primary).to.be('_id');
+      expect(Again._primary).to.be('random');
+    });
 
     it('emits the attr event', function(done) {
       User.on('attr', function(attr, opts) {
@@ -242,13 +259,113 @@ describe('Moko Base Methods', function() {
       }));
 
       it('supports lookup on a specific field', co(function *() {
-        var User = new Moko();
+        var User = new Moko('User');
         User.validate(function *() {
           user.error('name', 'dumb');
         });
         var user = yield new User();
         expect(yield user.isValid('brobob')).to.be(true);
         expect(yield user.isValid('name')).to.be(false);
+      }));
+    });
+
+    describe('#primary()', function() {
+      it('throws an error if primary is not determined', co(function *() {
+        var User = new Moko('User');
+        var user = yield new User();
+        expect(user.primary).to.throwError('primary key is not defined');
+      }));
+
+      it('returns the primary', co(function *() {
+        var user = yield new User({_id: 1});
+        expect(user.primary()).to.be(1);
+      }));
+    });
+
+    describe('#isNew()', function() {
+      it('returns true if primary() is set', co(function *() {
+        var user = yield new User();
+        expect(user.isNew()).to.be(true);
+      }));
+      it('returns false if primary() is not set', co(function *() {
+        var user = yield new User({_id: 1});
+        expect(user.isNew()).to.be(false);
+      }));
+    });
+
+    describe('#save', function() {
+      var User;
+      beforeEach(function () {
+        User = new Moko('User').attr('_id');
+      });
+
+      it('throws an error if no sync layer', co(function*() {
+        var Person = Moko('Person');
+        var user = yield new Person();
+        try {
+          yield user.save();
+          expect(false).to.be(true); // shouldnt get here
+        } catch(e) {
+          expect(e.message).to.be("No sync layer provided");
+        }
+      }));
+
+      it('throws an error if the model is invalid', co(function*() {
+        var Person = new Moko('Person');
+        Person.save = function *() {};
+        Person.update = function *() {};
+
+        var user = yield new Person();
+        Person.validate(function *(p) {
+          p.error('name', 'bad name');
+        });
+
+        try {
+          yield user.save();
+          expect(false).to.be(true); // shouldnt get here
+        } catch(e) {
+          expect(e.message).to.be("validation failed");
+        }
+      }));
+
+      it('calls Model.save when valid and new', co(function *() {
+        var called = false;
+        User.save = function *() {
+          called = true;
+        };
+        User.update = function *() { };
+        var user = yield new User();
+        yield user.save();
+        expect(called).to.be(true);
+      }));
+
+      it('calls Model.update when valid and old', co(function *() {
+        var called = false;
+
+        var User = new Moko('User');
+        User.save = function *() {};
+        User.update = function *() {
+          called = true;
+        };
+
+        User.attr('_id');
+
+        var user = yield new User({_id: 1});
+        yield user.save();
+        expect(called).to.be(true);
+      }));
+
+      it('calls allows skipping of validations', co(function *() {
+        var called = false;
+        var User = new Moko('User').attr('_id');
+        User.save = function *() { called = true; };
+        User.update = function *() {};
+        User.validate(function *(u) {
+          u.error('name', 'invalid');
+        });
+        var user = yield new User();
+        yield user.save(true);
+        
       }));
     });
   });
