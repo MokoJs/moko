@@ -33,9 +33,9 @@ describe('Moko Base Methods', function() {
   describe('Model.middleware', function() {
     it('adds the middleware', function() {
       function *gen() {}
-      User.middleware('initialize', gen);
-      expect(User._middlewares.initialize).to.have.length(1);
-      expect(User._middlewares.initialize[0]).to.be(gen);
+      User.middleware('initializing', gen);
+      expect(User._middlewares.initializing).to.have.length(1);
+      expect(User._middlewares.initializing[0]).to.be(gen);
     });
   });
 
@@ -50,9 +50,9 @@ describe('Moko Base Methods', function() {
         calledTwo = true;
         return true;
       }
-      User.middleware('initialize', genOne);
-      User.middleware('initialize', genTwo);
-      yield User.run('initialize');
+      User.middleware('initializing', genOne);
+      User.middleware('initializing', genTwo);
+      yield User.run('initializing');
       expect(called).to.be(true);
       expect(calledTwo).to.be(true);
       User.removeMiddleware();
@@ -140,14 +140,14 @@ describe('Moko', function() {
       User = new Moko('User');
     });
 
-    it('emits initialize on model', co(function *() {
+    it('runs "initializing" middleware on model', co(function *() {
       var called;
       function *middleware(instance, attrs) {
         expect(attrs).to.eql({name: 'Bob'});
         attrs.name = 'Steve';
         called = true;
       }
-      User.middleware('initialize', middleware);
+      User.middleware('initializing', middleware);
       var user = yield new User({name: 'Bob'});
       expect(called).to.be(true);
       expect(user._attrs.name).to.be('Steve');
