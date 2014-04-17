@@ -17,6 +17,15 @@ describe('Moko Base Methods', function() {
     it('initializes attrs', function() {
       expect(user._attrs).to.be.an(Object);
     });
+
+    it('supports arrays', co(function *() {
+      var users = yield new User([{name: 'Bobby'}, {name: 'Sam'}]);
+      expect(users).to.be.a(Array);
+      users.forEach(function() {
+        expect(users[0]).to.be.a(User);
+        expect(users[1]).to.be.a(User);
+      });
+    }));
   });
 
   describe('Model.use', function() {
