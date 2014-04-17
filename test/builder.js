@@ -16,4 +16,9 @@ describe('Moko Builder', function() {
     var User = new Moko('User');
     expect(User.modelName).to.be('User');
   });
+
+  it('sets the attrs to an empty object', function() {
+    var User = new Moko('User');
+    expect(User.attrs).to.eql({});
+  });
 });

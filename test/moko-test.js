@@ -77,11 +77,25 @@ describe('Moko Base Methods', function() {
       var user = yield new User({name: 'Bob'});
       expect(user.name).to.be('Bob');
     }));
+
     it('creates a setter', co(function*() {
       var user = yield new User();
       user.name = 'Bob';
       expect(user._attrs.name).to.be('Bob');
     }));
+
+    it('emits the attr event', function(done) {
+      User.on('attr', function(attr, opts) {
+        expect(attr).to.be('test');
+        expect(opts).to.eql({a: 1});
+        done();
+      });
+      User.attr('test', {a: 1});
+    });
+
+    it('adds the attr to Model.attrs', function() {
+      expect(User.attrs.name).to.eql({});
+    });
 
     describe('events', function() {
       it('emits "change" on model', function(done) {
@@ -139,6 +153,22 @@ describe('Moko Base Methods', function() {
           user.name = 'Marko';
         })();
       });
+    });
+  });
+  describe('instance methods', function() {
+    describe('moko.set', function() {
+      it('sets multiple attributes', co(function*() {
+        var user = yield new User();
+        user.set({name: 'bob'});
+        expect(user.name).to.be('bob');
+      }));
+
+      it('ignores attrs not in the schema', co(function*() {
+        var user = yield new User();
+        user.set({name: 'bob', age: 20});
+        expect(user.name).to.be('bob');
+        expect(user.age).to.be(undefined);
+      }));
     });
   });
 });
