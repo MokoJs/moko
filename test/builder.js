@@ -21,4 +21,22 @@ describe('Moko Builder', function() {
     var User = new Moko('User');
     expect(User.attrs).to.eql({});
   });
+
+  describe('use', function() {
+    it('adds it to the Moko builder-plugins', function() {
+      expect(Moko._plugins).to.be.an(Array);
+    });
+
+    it('always uses the plugin', function() {
+      var count = 0;
+      Moko.use(function(Model) {
+        count++;
+      });
+
+      new Moko('User');
+      new Moko('Person');
+
+      expect(count).to.be(2);
+    });
+  });
 });

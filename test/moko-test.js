@@ -156,7 +156,7 @@ describe('Moko Base Methods', function() {
     });
   });
   describe('instance methods', function() {
-    describe('moko.set', function() {
+    describe('instance.set', function() {
       it('sets multiple attributes', co(function*() {
         var user = yield new User();
         user.set({name: 'bob'});
