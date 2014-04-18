@@ -409,8 +409,21 @@ describe('Moko Base Methods', function() {
           expect(called).to.be(true);
           expect(args[0]).to.be(user._attrs);
         }));
-        it('runs the "updating" hook on the model');
-        it('runs the "updating" hook on the instance');
+        it('runs the "updating" hook on the model', co(function *() {
+          User.middleware('updating', checkCalled);
+          user = yield new User({_id: 1});
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user);
+          expect(args[1]).to.be(user._attrs);
+        }));
+        it('runs the "updating" hook on the instance', co(function *() {
+          user = yield new User({_id: 1});
+          user.middleware('updating', checkCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user._attrs);
+        }));
       });
 
       describe('events', function() {
