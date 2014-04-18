@@ -369,8 +369,33 @@ describe('Moko Base Methods', function() {
       }));
 
       describe('hooks', function() {
-        it('runs the "saving" hook on the model');
-        it('runs the "saving" hook on the instance');
+        var User, checkCalled, called, args, user;
+        beforeEach(co(function *() {
+          called = false;
+          args = undefined;
+          User = new Moko('User').attr('_id');
+          User.save = function *() { };
+          User.update = function *() { };
+          checkCalled = function *() {
+            args = Array.prototype.slice.call(arguments);
+            called = true;
+          };
+          user = yield new User();
+        }));
+
+        it('runs the "saving" hook on the model', co(function *() {
+          User.middleware('saving', checkCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user);
+          expect(args[1]).to.be(user._attrs);
+        }));
+        it('runs the "saving" hook on the instance', co(function *() {
+          user.middleware('saving', checkCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user._attrs);
+        }));
         it('runs the "creating" hook on the model');
         it('runs the "creating" hook on the instance');
       });
