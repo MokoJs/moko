@@ -269,7 +269,7 @@ describe('Moko Base Methods', function() {
       }));
     });
 
-    describe('#primary()', function() {
+    describe('#primary', function() {
       it('throws an error if primary is not determined', co(function *() {
         var User = new Moko('User');
         var user = yield new User();
@@ -282,7 +282,7 @@ describe('Moko Base Methods', function() {
       }));
     });
 
-    describe('#isNew()', function() {
+    describe('#isNew', function() {
       it('returns true if primary() is set', co(function *() {
         var user = yield new User();
         expect(user.isNew()).to.be(true);
@@ -355,7 +355,7 @@ describe('Moko Base Methods', function() {
         expect(called).to.be(true);
       }));
 
-      it('calls allows skipping of validations', co(function *() {
+      it('allows skipping of validations', co(function *() {
         var called = false;
         var User = new Moko('User').attr('_id');
         User.save = function *() { called = true; };
@@ -367,6 +367,20 @@ describe('Moko Base Methods', function() {
         yield user.save(true);
         
       }));
+
+      describe('hooks', function() {
+        it('runs the "saving" hook on the model');
+        it('runs the "saving" hook on the instance');
+        it('runs the "creating" hook on the model');
+        it('runs the "creating" hook on the instance');
+      });
+
+      describe('events', function() {
+        it('emits the "save" event on the model');
+        it('emits the "save" event on the instance');
+        it('emits the "create" event on the model');
+        it('emits the "create" event on the instance');
+      });
     });
   });
 });
