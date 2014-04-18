@@ -396,13 +396,28 @@ describe('Moko Base Methods', function() {
           expect(called).to.be(true);
           expect(args[0]).to.be(user._attrs);
         }));
-        it('runs the "creating" hook on the model');
-        it('runs the "creating" hook on the instance');
+        it('runs the "creating" hook on the model', co(function *() {
+          User.middleware('creating', checkCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user);
+          expect(args[1]).to.be(user._attrs);
+        }));
+        it('runs the "creating" hook on the instance', co(function *() {
+          user.middleware('creating', checkCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user._attrs);
+        }));
+        it('runs the "updating" hook on the model');
+        it('runs the "updating" hook on the instance');
       });
 
       describe('events', function() {
         it('emits the "save" event on the model');
         it('emits the "save" event on the instance');
+        it('emits the "update" event on the model');
+        it('emits the "update" event on the instance');
         it('emits the "create" event on the model');
         it('emits the "create" event on the instance');
       });
