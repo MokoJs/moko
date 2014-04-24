@@ -437,12 +437,58 @@ describe('Moko Base Methods', function() {
       });
 
       describe('events', function() {
-        it('emits the "save" event on the model');
-        it('emits the "save" event on the instance');
-        it('emits the "update" event on the model');
-        it('emits the "update" event on the instance');
-        it('emits the "create" event on the model');
-        it('emits the "create" event on the instance');
+        var User, user, called, setCalled, args;
+
+        beforeEach(co(function*() {
+          args = undefined;
+          User = new Moko('User').attr('_id');
+          user = yield new User();
+          called = false;
+          setCalled = function() { called = true; args = Array.prototype.slice.call(arguments); };
+          User.save = function *() { };
+          User.update = function *() { };
+        }));
+
+        it('emits the "save" event on the model', co(function*() {
+          user.model.on('save', setCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user);
+        }));
+
+        it('emits the "save" event on the instance', co(function*() {
+          user.on('save', setCalled);
+          yield user.save();
+          expect(called).to.be(true);
+        }));
+
+        it('emits the "update" event on the model', co(function*() {
+          user._attrs._id = 123;
+          user.model.on('update', setCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user);
+        }));
+
+        it('emits the "update" event on the instance', co(function*() {
+          user._attrs._id = 123;
+          user.on('update', setCalled);
+          yield user.save();
+          expect(called).to.be(true);
+        }));
+
+        it('emits the "create" event on the model', co(function*() {
+          user.model.on('create', setCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user);
+        }));
+
+        it('emits the "create" event on the instance', co(function*() {
+          user.on('create', setCalled);
+          yield user.save();
+          expect(called).to.be(true);
+        }));
       });
     });
   });
