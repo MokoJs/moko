@@ -213,7 +213,8 @@ describe('Moko Base Methods', function() {
     describe('#error', function() {
       it('adds the error', co(function *() {
         var user = yield new User();
-        user.error('name', 'cant be blank');
+        var result = user.error('name', 'cant be blank');
+        expect(result).to.be(user);
         expect(user._errors).to.have.property('name');
         expect(user._errors.name).to.have.length(1);
       }));
@@ -230,6 +231,12 @@ describe('Moko Base Methods', function() {
         var user = yield new User();
         user.error('name', 'cant be blank');
         expect(user.errors('name')).to.eql(['cant be blank']);
+      }));
+
+      it('returns the a copy of the errors object', co(function *() {
+        var user = yield new User();
+        user.error('name', 'cant be blank');
+        expect(user.errors('name')).to.not.be(user._errors['name']);
       }));
 
       it('returns an empty array if there are no errors', co(function *() {
@@ -308,6 +315,12 @@ describe('Moko Base Methods', function() {
         var User = new Moko('User');
         var user = yield new User();
         expect(user.primary).to.throwError('primary key is not defined');
+      }));
+
+      it('sets the primary', co(function *() {
+        var user = yield new User();
+        user.primary(1);
+        expect(user._attrs._id).to.be(1);
       }));
 
       it('returns the primary', co(function *() {
