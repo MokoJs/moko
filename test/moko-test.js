@@ -20,6 +20,10 @@ describe('Moko Base Methods', function() {
       expect(user._attrs).to.be.an(Object);
     });
 
+    it('initializes dirty', function() {
+      expect(user._dirty).to.be.an(Object);
+    });
+
     it('supports arrays', co(function *() {
       var users = yield new User([{name: 'Bobby'}, {name: 'Sam'}]);
       expect(users).to.be.a(Array);
@@ -90,6 +94,12 @@ describe('Moko Base Methods', function() {
       var Person = new Moko('Person');
       expect(Person.attr('name')).to.be(Person);
     });
+
+    it('updates dirty', co(function *() {
+      var user = yield new User();
+      user.name = 'Bob';
+      expect(user._dirty).to.have.property('name', 'Bob');
+    }));
 
     it('sets primary', function() {
       var Person = new Moko('Person').attr('id'),
@@ -388,26 +398,26 @@ describe('Moko Base Methods', function() {
           yield user.save();
           expect(called).to.be(true);
           expect(args[0]).to.be(user);
-          expect(args[1]).to.be(user._attrs);
+          expect(args[1]).to.be(user._dirty);
         }));
         it('runs the "saving" hook on the instance', co(function *() {
           user.middleware('saving', checkCalled);
           yield user.save();
           expect(called).to.be(true);
-          expect(args[0]).to.be(user._attrs);
+          expect(args[0]).to.be(user._dirty);
         }));
         it('runs the "creating" hook on the model', co(function *() {
           User.middleware('creating', checkCalled);
           yield user.save();
           expect(called).to.be(true);
           expect(args[0]).to.be(user);
-          expect(args[1]).to.be(user._attrs);
+          expect(args[1]).to.be(user._dirty);
         }));
         it('runs the "creating" hook on the instance', co(function *() {
           user.middleware('creating', checkCalled);
           yield user.save();
           expect(called).to.be(true);
-          expect(args[0]).to.be(user._attrs);
+          expect(args[0]).to.be(user._dirty);
         }));
         it('runs the "updating" hook on the model', co(function *() {
           User.middleware('updating', checkCalled);
@@ -415,14 +425,14 @@ describe('Moko Base Methods', function() {
           yield user.save();
           expect(called).to.be(true);
           expect(args[0]).to.be(user);
-          expect(args[1]).to.be(user._attrs);
+          expect(args[1]).to.be(user._dirty);
         }));
         it('runs the "updating" hook on the instance', co(function *() {
           user = yield new User({_id: 1});
           user.middleware('updating', checkCalled);
           yield user.save();
           expect(called).to.be(true);
-          expect(args[0]).to.be(user._attrs);
+          expect(args[0]).to.be(user._dirty);
         }));
       });
 
