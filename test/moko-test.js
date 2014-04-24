@@ -279,6 +279,30 @@ describe('Moko Base Methods', function() {
       }));
     });
 
+    describe('#toJSON', function() {
+      it('returns a JSON object', co(function*() {
+        var user = yield new User({name: 'Tobi'});
+        var json = user.toJSON();
+      }));
+
+      it('should clone, not reference attrs', co(function*() {
+        var user = yield new User({name: 'Tobi'});
+        var json = user.toJSON();
+        json.name = 'Bob';
+        expect(user.name).to.be('Tobi');
+      }));
+
+      it('is recursive', co(function*() {
+        var name = { f: 'Bob', l: 'Harris' };
+        name.toJSON = function() { 
+          return { first: this.f, last: this.l };
+        };
+        var user = yield new User({ name: name });
+        expect(user.toJSON().name).to.have.property('first', name.f);
+        expect(user.toJSON().name).to.have.property('last', name.l);
+      }));
+    });
+
     describe('#primary', function() {
       it('throws an error if primary is not determined', co(function *() {
         var User = new Moko('User');
