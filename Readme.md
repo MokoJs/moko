@@ -52,7 +52,7 @@ plugins are able to greatly extend functionality.
 Moko provides two ways for plugins/applications to monitor the models: Hooks,
 and events.
 
-#### Hooks
+### Hooks
 
 Hooks are [middlewares](http://github.com/rschmukler/co-middleware)
 and allow interception/mutation of data before it is used. Hooks are generator 
@@ -77,13 +77,13 @@ User.middleware('saving', function*(u) {
 ```
 
 
-#### Events
+### Events
 
 Events are emitted *after* something happens on the model. Built in events
 include:
 
-  -`save`, `create`, `update`
-  -`change`, and `change <attr>`
+- `save`, `create`, `update`
+- `change`, and `change <attr>`
 
 Example:
 
