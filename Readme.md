@@ -7,7 +7,7 @@ Generator-powered, highly extendible models made for use with
 ## Installation
 
 ```
-npm install modella
+npm install moko
 ```
 
 ## Example Usage
