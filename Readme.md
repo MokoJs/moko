@@ -105,3 +105,9 @@ co(function*() {
   user.name = 'Steve';
 })();
 ```
+
+## Resources
+
+- [Moko Plugin Creation
+  Guide](https://github.com/MokoJs/moko/wiki/Moko-Plugin-Creation-Guide)
+- [Moko Plugin List](https://github.com/MokoJs/moko/wiki/Moko-Plugin-List)
