@@ -3,6 +3,9 @@
 Generator-powered, highly extendible models made for use with
 [co](https://github.com/visionmedia/co).
 
+[![Build Status](https://api.travis-ci.org/MokoJs/moko.png)](http://travis-ci.org/MokoJs/moko)
+[![Coverage Status](https://coveralls.io/repos/MokoJs/moko/badge.png)](https://coveralls.io/r/MokoJs/moko)
+
 
 ## Installation
 
