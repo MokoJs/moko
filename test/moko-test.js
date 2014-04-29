@@ -218,6 +218,13 @@ describe('Moko Base Methods', function() {
         expect(user._errors).to.have.property('name');
         expect(user._errors.name).to.have.length(1);
       }));
+
+      it('prevents duplicate errors from appearing twice', co(function *() {
+        var user = yield new User();
+        user.error('name', 'cant be blank');
+        user.error('name', 'cant be blank');
+        expect(user._errors.name).to.have.length(1);
+      }));
     });
 
     describe('#errors', function() {
