@@ -51,14 +51,19 @@ plugins are able to greatly extend functionality.
 
 ## Events
 
-Moko provides two types of events, function based, and generator based.
-Generator based events allow you to "hook" in as middleware alter the data and
-yield to async operations, while function based hooks are standard event 
-listeners that can react to changes.
+Moko provides two types of events, `async` (powered by generators) and `sync`
+(powered by functions). `async` events happen before an operation and allow you to mutate the data,
+while `sync` events allow you to react to changes. In general, `async` events
+end with `ing` (eg. `saving`, `creating`, `initializing`).
 
-#### Built in generator events:
+Plugin authors are also encouraged to emit their own events to make it easy for
+users to hook into the plugins. See the guide below.
 
-Moko will emit the following events with `yieldable` generators...
+#### Built in async events:
+
+Moko will emit the following async events. Notice that you must use generators
+for async events, although your generators do not necessarily need to yield
+themselves.
 
 - `initializing(attrs)`
 - `creating(dirty)` - called before save when new
@@ -69,7 +74,7 @@ Examples:
 
 
 ```js
-User.on('initializing', function*(u, attrs) {
+User.on('initializing', function*(user, attrs) {
   attrs.name = 'Bob';
 });
 
@@ -78,8 +83,8 @@ console.log(user.name) // Logs "Bob";
 ```
 
 ```js
-User.on('creating', function*(u, dirty) {
-  dirty.createdAt = new Date();
+User.on('creating', function*(user, attrs) {
+  attrs.createdAt = new Date();
 });
 
 var user = yield new User({name: 'Stephen'});
@@ -111,18 +116,22 @@ User
   .attr('name')
   .attr('email');
 
-User.on('change name', function(u, name, old) {
+User.on('change name', function(user, name, old) {
   console.log("User changed name from %s to %s", old, name);
 });
 
-User.on('create', function(u) {
-  emails.sendWelcomeEmail(u.email(), function() { }) // anonymous callback fn
-});
 
 co(function*() {
   var user = yield new User({name: 'Bob'});
   user.name = 'Steve';
 })();
+```
+
+Fire and forget email sending on user-creation.
+```js
+User.on('create', function(user) {
+  emails.sendWelcomeEmail(u.email, function() { }) // anonymous callback fn
+});
 ```
 
 ## Resources
