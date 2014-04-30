@@ -45,35 +45,6 @@ describe('Moko Base Methods', function() {
     });
   });
 
-  describe('Model.middleware', function() {
-    it('adds the middleware', function() {
-      function *gen() {}
-      User.middleware('initializing', gen);
-      expect(User._middlewares.initializing).to.have.length(1);
-      expect(User._middlewares.initializing[0]).to.be(gen);
-    });
-  });
-
-  describe('Model.run', function() {
-    it('runs all the middlewares of given name', co(function *() {
-      var called, calledTwo;
-      function *genOne(args) {
-        called = true;
-        return true;
-      }
-      function *genTwo(args) {
-        calledTwo = true;
-        return true;
-      }
-      User.middleware('initializing', genOne);
-      User.middleware('initializing', genTwo);
-      yield User.run('initializing');
-      expect(called).to.be(true);
-      expect(calledTwo).to.be(true);
-      User.removeMiddleware();
-    }));
-  });
-
   describe('Model.attr', function() {
     before(function() {
       User.attr('name');
@@ -253,7 +224,7 @@ describe('Moko Base Methods', function() {
     });
 
     describe('#isValid', function() {
-      it('runs the validators', co(function *() {
+      it('emits the validators', co(function *() {
         var User = Moko('User'),
             user = yield new User();
 
@@ -422,65 +393,7 @@ describe('Moko Base Methods', function() {
         
       }));
 
-      describe('hooks', function() {
-        var User, checkCalled, called, args, user;
-        beforeEach(co(function *() {
-          called = false;
-          args = undefined;
-          User = new Moko('User').attr('_id');
-          User.save = function *() { };
-          User.update = function *() { };
-          checkCalled = function *() {
-            args = Array.prototype.slice.call(arguments);
-            called = true;
-          };
-          user = yield new User();
-        }));
-
-        it('runs the "saving" hook on the model', co(function *() {
-          User.middleware('saving', checkCalled);
-          yield user.save();
-          expect(called).to.be(true);
-          expect(args[0]).to.be(user);
-          expect(args[1]).to.be(user._dirty);
-        }));
-        it('runs the "saving" hook on the instance', co(function *() {
-          user.middleware('saving', checkCalled);
-          yield user.save();
-          expect(called).to.be(true);
-          expect(args[0]).to.be(user._dirty);
-        }));
-        it('runs the "creating" hook on the model', co(function *() {
-          User.middleware('creating', checkCalled);
-          yield user.save();
-          expect(called).to.be(true);
-          expect(args[0]).to.be(user);
-          expect(args[1]).to.be(user._dirty);
-        }));
-        it('runs the "creating" hook on the instance', co(function *() {
-          user.middleware('creating', checkCalled);
-          yield user.save();
-          expect(called).to.be(true);
-          expect(args[0]).to.be(user._dirty);
-        }));
-        it('runs the "updating" hook on the model', co(function *() {
-          User.middleware('updating', checkCalled);
-          user = yield new User({_id: 1});
-          yield user.save();
-          expect(called).to.be(true);
-          expect(args[0]).to.be(user);
-          expect(args[1]).to.be(user._dirty);
-        }));
-        it('runs the "updating" hook on the instance', co(function *() {
-          user = yield new User({_id: 1});
-          user.middleware('updating', checkCalled);
-          yield user.save();
-          expect(called).to.be(true);
-          expect(args[0]).to.be(user._dirty);
-        }));
-      });
-
-      describe('events', function() {
+      describe.only('events', function() {
         var User, user, called, setCalled, args;
 
         beforeEach(co(function*() {
@@ -489,8 +402,27 @@ describe('Moko Base Methods', function() {
           user = yield new User();
           called = false;
           setCalled = function() { called = true; args = Array.prototype.slice.call(arguments); };
+          checkCalled = function *() {
+            args = Array.prototype.slice.call(arguments);
+            called = true;
+          };
           User.save = function *() { };
           User.update = function *() { };
+        }));
+
+        it('emits the "saving" event on the model', co(function *() {
+          User.on('saving', checkCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user);
+          expect(args[1]).to.be(user._dirty);
+        }));
+
+        it('emits the "saving" event on the instance', co(function *() {
+          user.on('saving', checkCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user._dirty);
         }));
 
         it('emits the "save" event on the model', co(function*() {
@@ -506,6 +438,22 @@ describe('Moko Base Methods', function() {
           expect(called).to.be(true);
         }));
 
+        it('emits the "updating" event on the model', co(function *() {
+          User.on('updating', checkCalled);
+          user = yield new User({_id: 1});
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user);
+          expect(args[1]).to.be(user._dirty);
+        }));
+        it('emits the "updating" event on the instance', co(function *() {
+          user = yield new User({_id: 1});
+          user.on('updating', checkCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user._dirty);
+        }));
+
         it('emits the "update" event on the model', co(function*() {
           user._attrs._id = 123;
           user.model.on('update', setCalled);
@@ -519,6 +467,20 @@ describe('Moko Base Methods', function() {
           user.on('update', setCalled);
           yield user.save();
           expect(called).to.be(true);
+        }));
+
+        it('emits the "creating" event on the model', co(function *() {
+          User.on('creating', checkCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user);
+          expect(args[1]).to.be(user._dirty);
+        }));
+        it('emits the "creating" event on the instance', co(function *() {
+          user.on('creating', checkCalled);
+          yield user.save();
+          expect(called).to.be(true);
+          expect(args[0]).to.be(user._dirty);
         }));
 
         it('emits the "create" event on the model', co(function*() {
@@ -539,19 +501,19 @@ describe('Moko Base Methods', function() {
 });
 
 describe('Moko', function() {
-  describe('middleware hooks', function() {
+  describe('misc events', function() {
     beforeEach(function() {
       User = new Moko('User');
     });
 
-    it('runs "initializing" middleware on model', co(function *() {
+    it('emits "initializing" event on model', co(function *() {
       var called;
-      function *middleware(instance, attrs) {
+      function *listener(instance, attrs) {
         expect(attrs).to.eql({name: 'Bob'});
         attrs.name = 'Steve';
         called = true;
       }
-      User.middleware('initializing', middleware);
+      User.on('initializing', listener);
       var user = yield new User({name: 'Bob'});
       expect(called).to.be(true);
       expect(user._attrs.name).to.be('Steve');

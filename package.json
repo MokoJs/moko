@@ -28,9 +28,8 @@
   },
   "dependencies": {
     "co": "~3.0.2",
-    "co-middleware": "~0.3.0",
     "clone": "~0.1.11",
-    "emitter-component": "~1.1.1"
+    "co-emitter": "~0.2.0"
   },
   "devDependencies": {
     "mocha": "~1.16.2",
