@@ -101,11 +101,11 @@ Function events are emitted after something happens on the model.
 
 Built in events include:
 
--`change(attr, newVal, oldVal)`
--`change attr(newVal, oldVal)`
--`save`
--`create`
--`update`
+- `change(attr, newVal, oldVal)`
+- `change attr(newVal, oldVal)`
+- `save`
+- `create`
+- `update`
 
 
 ```js
