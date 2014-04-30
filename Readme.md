@@ -49,45 +49,64 @@ co(function*() {
 `moko` provides bare-bones models. By providing powerful hooks and events,
 plugins are able to greatly extend functionality.
 
-## Hooks and Events
+## Events
 
-Moko provides two ways for plugins/applications to monitor the models: Hooks,
-and events.
+Moko provides two types of events, function based, and generator based.
+Generator based events allow you to "hook" in as middleware alter the data and
+yield to async operations, while function based hooks are standard event 
+listeners that can react to changes.
 
-### Hooks
+#### Built in generator events:
 
-Hooks are [middlewares](http://github.com/rschmukler/co-middleware)
-and allow interception/mutation of data before it is used. Hooks are generator 
-functions and can therefor be async (using `yield` keyword). Built in hooks
-include:
+Moko will emit the following events with `yieldable` generators...
 
-- `initializing` - run when an instance is instantiated
-- `creating`, `updating`, and `saving` - run when an instance is saved (always
-  `saving` and `updating` or `creating` as appropriate.
+- `initializing(attrs)`
+- `creating(dirty)` - called before save when new
+- `saving(dirty)` - called before save
+- `updating(dirty)` - called before save when old
 
-Example:
+Examples:
+
 
 ```js
-User
-  .attr('firstName')
-  .attr('lastName')
-  .attr('familyMembers')
+User.on('initializing', function*(u, attrs) {
+  attrs.name = 'Bob';
+  return [u, attrs]; // Must return same as called with for chaining
+});
 
-User.middleware('saving', function*(u) {
-  u.familyMembers = yield User.db.count({lastName: u.lastName});
+var user = yield new User({name: 'Stephen'});
+console.log(user.name) // Logs "Bob";
+```
+
+```js
+User.on('creating', function*(u, dirty) {
+  dirty.createdAt = new Date();
+  return [u, attrs];
+});
+
+var user = yield new User({name: 'Stephen'});
+yield user.save();
+```
+
+```js
+User.on('saving', function*(u, dirty) {
+  var others = yield User.find({name: u.name}).count();
+  if(others) throw new Error('Will not save with non-unique name');
 });
 ```
 
+### Built in function events:
 
-### Events
+Function events are emitted after something happens on the model.
 
-Events are emitted *after* something happens on the model. Built in events
-include:
+Built in events include:
 
-- `save`, `create`, `update`
-- `change`, and `change <attr>`
+-`change(attr, newVal, oldVal)`
+-`change attr(newVal, oldVal)`
+-`save`
+-`create`
+-`update`
 
-Example:
 
 ```js
 User
