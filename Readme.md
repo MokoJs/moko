@@ -98,7 +98,7 @@ User.on('saving', function*(u, dirty) {
 });
 ```
 
-### Built in function events:
+#### Built in sync events:
 
 Function events are emitted after something happens on the model.
 
