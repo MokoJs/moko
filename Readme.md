@@ -65,10 +65,10 @@ Moko will emit the following async events. Notice that you must use generators
 for async events, although your generators do not necessarily need to yield
 themselves.
 
-- `initializing(attrs)`
-- `creating(dirty)` - called before save when new
+- `initializing(attrs)` - called when a model is first initialzed
 - `saving(dirty)` - called before save
-- `updating(dirty)` - called before save when old
+- `creating(dirty)` - called before save when the model did not exist prior
+- `updating(dirty)` - called before save when the model did exist prior
 
 Examples:
 
@@ -104,11 +104,11 @@ Function events are emitted after something happens on the model.
 
 Built in events include:
 
-- `change(attr, newVal, oldVal)`
-- `change attr(newVal, oldVal)`
-- `save`
-- `create`
-- `update`
+- `change(attr, newVal, oldVal)` - called when an attr changes
+- `change attr(newVal, oldVal)` - called when `attr` changes
+- `save` - called after save
+- `create` - called after save when model did not exist prior
+- `update` - called after save when model did exist prior
 
 
 ```js

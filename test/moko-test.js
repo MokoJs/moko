@@ -393,7 +393,7 @@ describe('Moko Base Methods', function() {
         
       }));
 
-      describe.only('events', function() {
+      describe('events', function() {
         var User, user, called, setCalled, args;
 
         beforeEach(co(function*() {
