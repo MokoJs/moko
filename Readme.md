@@ -71,7 +71,6 @@ Examples:
 ```js
 User.on('initializing', function*(u, attrs) {
   attrs.name = 'Bob';
-  return [u, attrs]; // Must return same as called with for chaining
 });
 
 var user = yield new User({name: 'Stephen'});
@@ -81,7 +80,6 @@ console.log(user.name) // Logs "Bob";
 ```js
 User.on('creating', function*(u, dirty) {
   dirty.createdAt = new Date();
-  return [u, attrs];
 });
 
 var user = yield new User({name: 'Stephen'});
