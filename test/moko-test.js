@@ -519,5 +519,16 @@ describe('Moko', function() {
       expect(user._attrs.name).to.be('Steve');
     }));
 
+    it('emits "initialize" event on model', co(function *() {
+      var called;
+      function listener(instance) {
+        expect(instance).to.be.an(User);
+        called = true;
+      }
+      User.on('initialize', listener);
+      var user = yield new User({name: 'Bob'});
+      expect(called).to.be(true);
+    }));
+
   });
 });

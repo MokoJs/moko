@@ -104,6 +104,7 @@ Function events are emitted after something happens on the model.
 
 Built in events include:
 
+- `initialize(instance)` - called after an instance is done initializing
 - `change(attr, newVal, oldVal)` - called when an attr changes
 - `change attr(newVal, oldVal)` - called when `attr` changes
 - `save` - called after save
