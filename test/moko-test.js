@@ -50,6 +50,14 @@ describe('Moko Base Methods', function() {
       User.attr('name');
     });
 
+    it('allows attrs to be defined multiple twice', co(function*() {
+      var Alt = Moko('User');
+      Alt.attr('name', { test: 'a', another: 'b' })
+          .attr('name', { test: 'c' });
+      expect(Alt.attrs.name.another).to.be('b');
+      expect(Alt.attrs.name.test).to.be('c');
+    }));
+
     it('creates a getter', co(function*() {
       var user = yield new User({name: 'Bob'});
       expect(user.name).to.be('Bob');
