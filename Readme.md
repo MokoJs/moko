@@ -40,6 +40,13 @@ co(function*() {
 
 ```
 
+## Early edition...
+
+Moko is currently in active development. There docs might be incomplete, and
+the essential plugins missing. That being said, you're definitely welcome to
+play with it and give feedback to help shape the library. If you are interested
+in joining the organization and contributing your own plugins, please reach out.
+
 ## Philosophy
 
 `moko` is the spiritual successor to
