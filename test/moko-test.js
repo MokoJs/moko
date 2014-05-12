@@ -326,6 +326,68 @@ describe('Moko Base Methods', function() {
       }));
     });
 
+    describe.only('#remove', function() {
+      var ctx;
+      var Person = new Moko('Person').attr('_id').attr('name');
+      Person.remove = function*() { ctx = this; };
+
+      beforeEach(function() {
+        ctx = undefined;
+      });
+
+      it('throws an error if the sync layer has no remove', co(function*() {
+        var user = yield new User();
+        try {
+          yield user.remove();
+          throw new Error();
+        } catch(e) {
+          expect(e.message).to.be('No sync layer provided');
+        }
+      }));
+
+      it('throws an error if the model is not saved', co(function*() {
+        var user = yield new Person();
+        try {
+          yield user.remove();
+          throw new Error();
+        } catch(e) {
+          expect(e.message).to.be('not saved');
+        }
+      }));
+
+      it('calls the remove method', co(function*() {
+        var person = yield new Person({_id: '1'});
+        yield person.remove();
+        expect(ctx).to.be(person);
+      }));
+
+      it('sets removed to true', co(function*() {
+        var person = yield new Person({_id: '1'});
+        yield person.remove();
+        expect(person.removed).to.be(true);
+      }));
+
+      it('runs the removing middleware', co(function*() {
+        var modelCalled, instanceCalled;
+        var person = yield new Person({_id: '1'});
+        Person.once('removing', function*() { modelCalled = true; });
+        person.once('removing', function*() { instanceCalled = true; });
+        yield person.remove();
+        expect(modelCalled).to.be(true);
+        expect(instanceCalled).to.be(true);
+      }));
+
+      it('emits the remove events', co(function*() {
+        var modelCalled, instanceCalled;
+        var person = yield new Person({_id: '1'});
+        Person.once('remove', function() { modelCalled = true; });
+        person.once('remove', function() { instanceCalled = true; });
+        yield person.remove();
+        expect(modelCalled).to.be(true);
+        expect(instanceCalled).to.be(true);
+      }));
+    });
+
     describe('#save', function() {
       var User;
       beforeEach(function () {
