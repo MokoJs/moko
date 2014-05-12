@@ -326,7 +326,7 @@ describe('Moko Base Methods', function() {
       }));
     });
 
-    describe.only('#remove', function() {
+    describe('#remove', function() {
       var ctx;
       var Person = new Moko('Person').attr('_id').attr('name');
       Person.remove = function*() { ctx = this; };
