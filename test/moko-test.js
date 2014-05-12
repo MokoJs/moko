@@ -43,6 +43,14 @@ describe('Moko Base Methods', function() {
         done();
       }
     });
+
+    it('allows for generator-based plugins', function(done) {
+      co(function*() {
+        yield User.use(function*() {
+          done();
+        });
+      })();
+    })
   });
 
   describe('Model.attr', function() {
