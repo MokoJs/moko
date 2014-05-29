@@ -1,4 +1,15 @@
 
+0.1.2 / 2014-05-29 
+==================
+
+ * version bump co-emitter
+ * add utils to moko
+ * revert back to not passing dirty, but instead update this._dirty
+ * add support for yieldable plugins
+ * fix test scope, add isGenerator util
+ * add remove method to prototype
+ * add allowing redefinition of attrs
+
 0.1.1 / 2014-05-01 
 ==================
 
