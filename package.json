@@ -29,7 +29,7 @@
   "dependencies": {
     "co": "~3.0.2",
     "clone": "~0.1.11",
-    "co-emitter": "~0.2.0"
+    "co-emitter": "~0.2.3"
   },
   "devDependencies": {
     "mocha": "~1.16.2",
