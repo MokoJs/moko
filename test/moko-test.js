@@ -6,7 +6,7 @@ var expect = require('expect.js'),
 var Moko = require('../'),
     User = new Moko('User');
 
-User.attr('_id');
+User.attr('_id').attr('name');
 
 describe('Moko Base Methods', function() {
 
@@ -31,6 +31,12 @@ describe('Moko Base Methods', function() {
         expect(users[0]).to.be.a(User);
         expect(users[1]).to.be.a(User);
       });
+    }));
+
+    it('supports setting attrs', co(function*() {
+      var user = yield new User({name: 'Bob', age: 47 });
+      expect(user._attrs).to.have.property('name', 'Bob');
+      expect(user._attrs).to.not.have.property('age');
     }));
   });
 
@@ -581,7 +587,7 @@ describe('Moko Base Methods', function() {
 describe('Moko', function() {
   describe('misc events', function() {
     beforeEach(function() {
-      User = new Moko('User');
+      User = new Moko('User').attr('name');
     });
 
     it('emits "initializing" event on model', co(function *() {
