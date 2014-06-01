@@ -434,6 +434,7 @@ describe('Moko Base Methods', function() {
           expect(false).to.be(true); // shouldnt get here
         } catch(e) {
           expect(e.message).to.be("validation failed");
+          expect(e.errors).to.be.an(Object);
         }
       }));
 
