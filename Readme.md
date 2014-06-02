@@ -6,20 +6,20 @@ Generator-powered, highly extendible models made for use with
 [![Build Status](https://api.travis-ci.org/MokoJs/moko.png)](http://travis-ci.org/MokoJs/moko)
 
 
-## Installation
+# Installation
 
 ```
 npm install moko
 ```
 
-## Example Usage
+# Example Usage
 
 ```js
 var moko = require('moko'),
     validators = require('moko-validators'),
     mongo = require('moko-mongo');
 
-var User = require('moko');
+var User = moko('User');
 
 User
   .attr('_id')
@@ -40,23 +40,28 @@ co(function*() {
 
 ```
 
-## Early edition...
+# Table of Contents
 
-Moko is currently in active development. There docs might be incomplete, and
-the essential plugins missing. That being said, you're definitely welcome to
-play with it and give feedback to help shape the library. If you are interested
-in joining the organization and contributing your own plugins, please reach out.
+- [Philosophy](#philosophy)
+- [Events](#events)
+- [API Documentation](#api-documentation)
+  - [Creating and Configuring Models](#creating-and-configuring-models)
 
-## Philosophy
+# Philosophy
 
 `moko` is the spiritual successor to
-[modella](http://github.com/modella/modella), updated for use with upcoming ECMA
+[modella](http://github.com/modella/modella), updated for use with ECMA
 6 generators.
 
-`moko` provides bare-bones models. By providing powerful hooks and events,
-plugins are able to greatly extend functionality.
+`moko` provides bare-bones models and an API to extend them. Plugins are mixed
+into models adding functionality as needed. Plugins are easy to write (see the [Moko Plugin Creation 
+Guide](https://github.com/MokoJs/moko/wiki/Moko-Plugin-Creation-Guide)) and
+readily shared within the moko community (see the [Moko Plugin List](https://github.com/MokoJs/moko/wiki/Moko-Plugin-List))
 
-## Events
+The organization is open for those who would like to join. Simply reach out to
+[Ryan](mailto:ryan@slingingcode.com) and say hi!
+
+# Events
 
 Moko provides two types of events, `async` (powered by generators) and `sync`
 (powered by functions). `async` events happen before an operation and allow you to mutate the data,
@@ -64,13 +69,13 @@ while `sync` events allow you to react to changes. In general, `async` events
 end with `ing` (eg. `saving`, `creating`, `initializing`).
 
 Plugin authors are also encouraged to emit their own events to make it easy for
-users to hook into the plugins. See the guide below.
+users to hook into the plugins.
 
-#### Built in async events:
+### Built in async events:
 
-Moko will emit the following async events. Notice that you must use generators
-for async events, although your generators do not necessarily need to yield
-themselves.
+Moko will emit the following async events. Notice that you must **use
+generators** for async events, although your generators do not necessarily 
+need to yield themselves.
 
 - `initializing(attrs)` - called when a model is first initialzed
 - `saving(dirty)` - called before save
@@ -105,9 +110,9 @@ User.on('saving', function*(u, dirty) {
 });
 ```
 
-#### Built in sync events:
+### Built in sync events:
 
-Function events are emitted after something happens on the model.
+**Function** (not generator) events are emitted after something happens on the model.
 
 Built in events include:
 
@@ -142,7 +147,97 @@ User.on('create', function(user) {
 });
 ```
 
-## Resources
+# API Documentation
+
+## Creating and Configuring Models
+
+### Model Creation
+
+To create a Model, simply call `moko` with the name of the model. If preferred
+you can also call `new Moko(name)`.
+
+```js
+var moko = require('moko');
+
+var User = moko('User');
+
+User instanceof moko // true
+console.log(User.modelName) // => 'User'
+
+// or
+
+var Person = new moko('Person');
+```
+
+### Model Configuration
+
+All model configuration methods are chainable.
+
+#### Model.attr(name, opts)
+
+Defines attribute `name` on instances, adding `change` events. (see
+[events](#events) below)
+
+`opts` is an object that can be used by plugins.
+
+```js
+var User = moko('User');
+
+User
+  .attr('name', { required: true })
+  .attr('age',  { type: Number });
+```
+
+#### Model.validate(fn*)
+
+Adds a validator `fn*(instance)` which can add errors to an instance.
+
+```js
+var User = moko('User');.attr('name');
+
+var requireNameSteve = function*(user) {
+  if(user.name != 'Steve') user.error('name', 'must be steve');
+};
+
+User.validate(requireNameSteve);
+```
+
+#### Model.use(plugin)
+
+Configures a model to use a plugin. See the [list of
+plugins](https://github.com/MokoJs/moko/wiki/Moko-Plugin-List) or the [plugin
+creation guide](https://github.com/MokoJs/moko/wiki/Moko-Plugin-Creation-Guide)
+to get started writing your own.
+
+```js
+var mongo = require('moko-mongo'),
+    validators = require('moko-validators'),
+    timestamps = require('moko-timestamps');
+
+var db = yield mongo('mongodb://localhost:27017/moko-test');
+
+User
+ .use(db)
+ .use(validators)
+ .use(timestamps);
+```
+
+#### Event Methods
+
+A moko Model mixes in [co-emitter](htts://github.com/rschmukler/co-emitter), see
+the full documentation for details. It exposes the following methods:
+
+- `on(event, fn*)` - add a listener for an event
+- `once(event, fn*)` - add a one-time listener for an event
+- `emit(event, ...args)` - emit an event with `...args`
+- `off(event, listener)` - remove a listener for an event
+- `removeAllListeners` - removes all listeners
+- `hasListeners(event)` - check whether an event has listeners
+- `listeners(event)` - get an array of listeners for an event
+
+
+
+# Resources
 
 - [Moko Plugin Creation
   Guide](https://github.com/MokoJs/moko/wiki/Moko-Plugin-Creation-Guide)
