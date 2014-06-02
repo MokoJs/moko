@@ -1,4 +1,13 @@
 
+0.1.3 / 2014-06-02 
+==================
+
+ * fix save emitting change events, 
+ * fix dirty not getting reset after save
+ * make Model.validate chainable
+ * add errors property to the validation failed error [closes #2]
+ * fix attrs being set even if they weren't defined [closes #3]
+
 0.1.2 / 2014-05-29 
 ==================
 
