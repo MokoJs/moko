@@ -185,6 +185,12 @@ describe('Moko Base Methods', function() {
       expect(User._validators[0]).to.be(validator);
       User._validators = [];
     });
+
+    it('returns the Model', function() {
+      var validator = function*() {
+      };
+      expect(User.validate(validator)).to.be(User);
+    });
   });
 
   describe('instance methods', function() {
