@@ -44,8 +44,14 @@ co(function*() {
 
 - [Philosophy](#philosophy)
 - [Events](#events)
+  - [Bult in Async Events](#built-in-async-events)
+  - [Bult in Sync Events](#built-in-sync-events)
 - [API Documentation](#api-documentation)
   - [Creating and Configuring Models](#creating-and-configuring-models)
+  - [Working with Instances](#working-with-instances)
+    - [Persistence / Sync Layer](#persistence-sync-layer)
+    - [Errors and Validation](#errors-and-validation)
+  - [Utilities](#utilities)
 
 # Philosophy
 
@@ -186,6 +192,14 @@ var User = moko('User');
 User
   .attr('name', { required: true })
   .attr('age',  { type: Number });
+
+User.on('change name', function(u, name, old) {
+  console.log(old + ' changed name to ' + name);
+});
+
+var user = yield new User({name: 'Steve'});
+
+user.name = 'Bob';
 ```
 
 #### Model.validate(fn*)
@@ -231,11 +245,158 @@ the full documentation for details. It exposes the following methods:
 - `once(event, fn*)` - add a one-time listener for an event
 - `emit(event, ...args)` - emit an event with `...args`
 - `off(event, listener)` - remove a listener for an event
-- `removeAllListeners` - removes all listeners
+- `removeAllListeners()` - removes all listeners
 - `hasListeners(event)` - check whether an event has listeners
 - `listeners(event)` - get an array of listeners for an event
 
+## Working with Instances
 
+Instances are created by `yielding` to a `new Model`. This allows async events
+to happen on `initializing` (such as pre-populating relations from the
+database).
+
+```js
+var user = yield new User({name: 'Bob'});
+```
+
+#### instance.set(attrs)
+
+Takes an object of `attrs` and sets the models properties accordingly. If an
+attribute is passed in that isn't defined on the model, it will be skipped.
+
+```js
+var User = moko('User');
+
+User.attr('name');
+
+var bob = yield new User();
+bob.set({name: 'Bob', age: 24});
+
+bob.name == 'Bob' // true
+bob.age === undefined // true, age wasn't a defined attr
+```
+
+#### instance.toJSON()
+
+Returns a cloned object of the instances `attrs`.
+
+```js
+this.body = user.toJSON(); // inside koa
+```
+
+### Persistence / Sync Layer
+
+`moko` provides a variety of methods to persist models to a sync layer. Out of
+the box it does not use have any sync layer baked in, so without using one (as a
+plugin) these methods can throw errors.
+
+#### instance.primary(val)
+
+If `val` is undefined, returns the primary key of the model (by default
+`instance._id` or `instance.id`, whichever exists.
+
+If `val` is specified, sets the primary key attribute (`instance._id or
+instance.id`).
+
+You can also specify a primary key manually at time of attribute definition:
+
+```js
+var User = moko('User').attr('username', { primary: true });
+
+var user = yield new User();
+
+user.primary('bob');
+console.log(user.username) // 'Bob'
+
+user.primary() // 'Bob'
+```
+
+#### instance.isNew()
+
+Returns whether `instance.primary()` is defined.
+
+```js
+var userA = yield new User({_id: 123 });
+userA.isNew(); // false
+
+var userB = yield new User();
+userB.isNew(); // true
+```
+
+#### instance.save(skipValidations)
+
+Will save if a sync-layer plugin has been registered. Will only save if the
+model is valid, otherwise will throw an error.
+
+To save regardless of being valid or not, pass in `skipValidations` as true.
+
+```js
+try {
+  yield user.save();
+} catch(e) {
+  // deal with error;
+}
+```
+
+#### instance.remove()
+
+Will remove the model if the sync layer provides it.
+
+Will set `instance.removed` to true.
+
+```js
+yield user.remove();
+```
+
+### Errors and Validation
+
+#### instance.error(attr, reason)
+
+Registers an error (`reason`) on `attr`.
+
+```js
+if(!user.name) user.error('name', 'is required');
+```
+
+#### instance.errors([attr])
+
+Returns an error object, in the format of `{attr: [errors]}`. 
+
+If `attr` is specified, returns an array of errors for that `attr`. 
+If no errors are registered for `attr` it returns an empty array.
+
+```js
+user.error('name', 'is stupid');
+user.error('name', 'is short');
+user.error('age', 'is too young');
+
+user.errors() // { name: ['is stupid', 'is short'], age: ['is too young'] }
+user.errors('name') // ['is stupid', 'is short']
+user.errors('favoriteColor') // []
+```
+
+#### instance.isValid(attr)
+
+Runs all validators, and checks whether the instance has any errors or not.
+
+If `attr` is provided, reports whether that specific `attr` is valid.
+
+To support async validations, you must `yield` to `isValid`.
+
+```js
+var valid = yield user.isValid();
+```
+
+## Utilities
+
+Moko exports common utilities to make it so that plugins don't need to end up
+requiring the same modules.
+
+Built in utilities include:
+
+- `moko.utils.clone` - does a deep clone of an object
+- `moko.utils.isGenerator` - returns true if a function is a generator
+- `moko.utils.type` - returns a string representation of type (eg. `array`)
 
 # Resources
 
