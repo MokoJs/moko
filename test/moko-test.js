@@ -471,6 +471,20 @@ describe('Moko Base Methods', function() {
         expect(called).to.be(true);
       }));
 
+      it('clears _dirty on success', co(function *() {
+
+        var User = new Moko('User');
+        User.save = User.update = function *() {};
+
+        User.attr('_id').attr('name');
+
+        var user = yield new User({_id: 1});
+        user.name = 'Bob';
+        expect(user._dirty).to.have.property('name');
+        yield user.save();
+        expect(user._dirty).to.eql({});
+      }));
+
       it('allows skipping of validations', co(function *() {
         var called = false;
         var User = new Moko('User').attr('_id');
@@ -503,17 +517,19 @@ describe('Moko Base Methods', function() {
 
         it('emits the "saving" event on the model', co(function *() {
           User.on('saving', checkCalled);
+          var dirty = user._dirty;
           yield user.save();
           expect(called).to.be(true);
           expect(args[0]).to.be(user);
-          expect(args[1]).to.be(user._dirty);
+          expect(args[1]).to.eql(dirty);
         }));
 
         it('emits the "saving" event on the instance', co(function *() {
           user.on('saving', checkCalled);
+          var dirty = user._dirty;
           yield user.save();
           expect(called).to.be(true);
-          expect(args[0]).to.be(user._dirty);
+          expect(args[0]).to.eql(dirty);
         }));
 
         it('emits the "save" event on the model', co(function*() {
@@ -532,17 +548,19 @@ describe('Moko Base Methods', function() {
         it('emits the "updating" event on the model', co(function *() {
           User.on('updating', checkCalled);
           user = yield new User({_id: 1});
+          var dirty = user._dirty;
           yield user.save();
           expect(called).to.be(true);
           expect(args[0]).to.be(user);
-          expect(args[1]).to.be(user._dirty);
+          expect(args[1]).to.be(dirty);
         }));
         it('emits the "updating" event on the instance', co(function *() {
           user = yield new User({_id: 1});
+          var dirty = user._dirty;
           user.on('updating', checkCalled);
           yield user.save();
           expect(called).to.be(true);
-          expect(args[0]).to.be(user._dirty);
+          expect(args[0]).to.be(dirty);
         }));
 
         it('emits the "update" event on the model', co(function*() {
@@ -562,16 +580,18 @@ describe('Moko Base Methods', function() {
 
         it('emits the "creating" event on the model', co(function *() {
           User.on('creating', checkCalled);
+          var dirty = user._attrs;
           yield user.save();
           expect(called).to.be(true);
           expect(args[0]).to.be(user);
-          expect(args[1]).to.be(user._dirty);
+          expect(args[1]).to.be(dirty);
         }));
         it('emits the "creating" event on the instance', co(function *() {
           user.on('creating', checkCalled);
+          var dirty = user._attrs;
           yield user.save();
           expect(called).to.be(true);
-          expect(args[0]).to.be(user._dirty);
+          expect(args[0]).to.be(dirty);
         }));
 
         it('emits the "create" event on the model', co(function*() {
