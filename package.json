@@ -1,6 +1,6 @@
 {
   "name": "moko",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Generator based models",
   "main": "index.js",
   "scripts": {
