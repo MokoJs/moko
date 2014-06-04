@@ -305,6 +305,12 @@ describe('Moko Base Methods', function() {
         expect(user.name).to.be('Tobi');
       }));
 
+      it('works with null values', co(function*() {
+        var user = yield new User({name: null});
+        var json = user.toJSON();
+        expect(json.name).to.be(null);
+      }));
+
       it('is recursive', co(function*() {
         var name = { f: 'Bob', l: 'Harris' };
         name.toJSON = function() { 
