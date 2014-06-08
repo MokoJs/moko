@@ -51,7 +51,8 @@ co(function*() {
   - [Working with Instances](#working-with-instances)
     - [Persistence / Sync Layer](#persistence-sync-layer)
     - [Errors and Validation](#errors-and-validation)
-  - [Utilities](#utilities)
+- [Utilities](#utilities)
+- [Resources](#resources)
 
 # Philosophy
 
