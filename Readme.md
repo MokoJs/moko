@@ -28,7 +28,7 @@ User
 
 User
   .use(validators)
-  .use(mongo('localhost:27017/moko-test'));
+  .use(yield mongo('localhost:27017/moko-test'));
 
 co(function*() {
   var user = yield new User();
